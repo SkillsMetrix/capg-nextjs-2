@@ -1,4 +1,95 @@
 'use client'
+import styles from '../styles/App.module.css'
+
+export default function UserItem({user}){
+
+    return (
+        <div className={styles.item}>
+            <div>
+                <strong>{user.username}</strong> -{user.email} - {user.city}
+            </div>
+        </div>
+    )
+}
+----------
+
+
+'use client'
+import styles from '../styles/App.module.css'
+import UserItem from './User'
+
+export default function UserList({users}){
+    if(!users.length) return <div className={styles.empty}>No User Saved Yet </div>
+
+    return (
+        <div>
+        <h3>User Details</h3>
+        <div className={styles.list}>
+            {users.map(u => (
+                <UserItem user={u} key={u.id}/>
+            ))}
+        </div>
+        </div>
+    )
+}
+
+------
+
+export const STORAGE_KEY = "capg_users";
+
+export const writeToStorage = (users) => {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
+  } catch (e) {
+    console.error("Write to Storage error ", e);
+  }
+};
+
+export const readFromStorage=()=>{
+  try{
+    const data= localStorage.getItem(STORAGE_KEY)
+    return data ? JSON.parse(data): []
+  }catch(e){console.error("read from Storage error ", e);}
+}
+
+--------
+
+"use client";
+import AddUser from "./AddUser";
+import Footer from "./Footer";
+import Header from "./Header";
+import styles from "../styles/App.module.css";
+import { useUsers } from "../hooks/useUsers";
+import UserList from "./Users";
+
+function MainApp() {
+  const {users,addUser} = useUsers()
+  const Header_Message = " NextJS User CRUD App";
+  const FOOTER_Message = " User CopyRight Mesage";
+  return (
+    <div>
+      <Header hm={Header_Message} />
+      <main className={styles.container}>
+        <div className={styles.grid}>
+          <div className={styles.card}>
+            <AddUser onAdd={addUser} />
+          </div>
+          <div>
+            <UserList users={users}/>
+          </div>
+        </div>
+        <hr/>
+        <br/>
+        <Footer fm={FOOTER_Message} />
+      </main>
+    </div>
+  );
+}
+export default MainApp;
+-
+----------
+
+'use client'
 
 import { useState } from 'react'
 import styles from '../styles/App.module.css'
@@ -11,8 +102,13 @@ const handleSubmit=(e)=>{
     e.preventDefault()
     if(!username.trim() || !email.trim() || !city.trim()) return alert('All Fields are required')
         onAdd({username:username.trim(),email:email.trim(),city:city.trim()})
+        reset()
 }
-
+const reset=()=>{
+    setUsername('')
+    setEmail('')
+    setCity('')
+}
 
     return (
         <form className={styles.form} onSubmit={handleSubmit}>
@@ -26,69 +122,4 @@ const handleSubmit=(e)=>{
         </form>
     )
 }
-----
 
-
-"use client";
-
-import { useEffect, useState } from "react";
-
-export function useUsers() {
-  const [users, setUsers] = useState([]);
-
-  useEffect(() => {
-    //setUsers
-  });
-
-  const addUser = (user) => {
-    setUsers((prev) => [...prev, { ...user, id: Date.now().toString() }]);
-    console.log(...users);
-    
-  };
-  return { users, addUser };
-}
-
-
----------
-
-export const STORAGE_KEY = "capg_users";
-
-export const writeToStorage = (users) => {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
-  } catch (e) {
-    console.error("Write to Storage error ", e);
-  }
-};
-
-
---------
-
-"use client";
-import AddUser from "./AddUser";
-import Footer from "./Footer";
-import Header from "./Header";
-import styles from "../styles/App.module.css";
-import { useUsers } from "../hooks/useUsers";
-
-function MainApp() {
-  const {addUser} = useUsers()
-  const Header_Message = " NextJS User CRUD App";
-  const FOOTER_Message = " User CopyRight Mesage";
-  return (
-    <div>
-      <Header hm={Header_Message} />
-      <main className={styles.container}>
-        <div className={styles.grid}>
-          <div className={styles.card}>
-            <AddUser onAdd={addUser} />
-          </div>
-        </div>
-        <hr/>
-        <br/>
-        <Footer fm={FOOTER_Message} />
-      </main>
-    </div>
-  );
-}
-export default MainApp;

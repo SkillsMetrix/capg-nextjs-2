@@ -1,3 +1,29 @@
+
+"use client";
+
+import { useEffect, useState } from "react";
+import { readFromStorage, writeToStorage } from "../lib/storage";
+
+export function useUsers() {
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    setUsers(readFromStorage);
+  }, []);
+
+  useEffect(() => {
+    writeToStorage(users);
+  }, [users]);
+
+  const addUser = (user) => {
+    setUsers((prev) => [...prev, { ...user, id: Date.now().toString() }]);
+    console.log(...users);
+  };
+  return { users, addUser };
+}
+
+------------
+
 'use client'
 import styles from '../styles/App.module.css'
 

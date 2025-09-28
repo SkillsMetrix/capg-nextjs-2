@@ -1,151 +1,66 @@
+/* components/Navigation.module.css */
 
-"use client";
-
-import { useEffect, useState } from "react";
-import { readFromStorage, writeToStorage } from "../lib/storage";
-
-export function useUsers() {
-  const [users, setUsers] = useState([]);
-
-  useEffect(() => {
-    setUsers(readFromStorage);
-  }, []);
-
-  useEffect(() => {
-    writeToStorage(users);
-  }, [users]);
-
-  const addUser = (user) => {
-    setUsers((prev) => [...prev, { ...user, id: Date.now().toString() }]);
-    console.log(...users);
-  };
-  return { users, addUser };
+.navBar {
+  background: var(--nav-bg);
+  border-bottom: 1px solid var(--nav-border);
+  padding: 12px 20px;
 }
 
-------------
-
-'use client'
-import styles from '../styles/App.module.css'
-
-export default function UserItem({user}){
-
-    return (
-        <div className={styles.item}>
-            <div>
-                <strong>{user.username}</strong> -{user.email} - {user.city}
-            </div>
-        </div>
-    )
-}
-----------
-
-
-'use client'
-import styles from '../styles/App.module.css'
-import UserItem from './User'
-
-export default function UserList({users}){
-    if(!users.length) return <div className={styles.empty}>No User Saved Yet </div>
-
-    return (
-        <div>
-        <h3>User Details</h3>
-        <div className={styles.list}>
-            {users.map(u => (
-                <UserItem user={u} key={u.id}/>
-            ))}
-        </div>
-        </div>
-    )
+.navList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 18px;
+  align-items: center;
 }
 
-------
-
-export const STORAGE_KEY = "capg_users";
-
-export const writeToStorage = (users) => {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
-  } catch (e) {
-    console.error("Write to Storage error ", e);
-  }
-};
-
-export const readFromStorage=()=>{
-  try{
-    const data= localStorage.getItem(STORAGE_KEY)
-    return data ? JSON.parse(data): []
-  }catch(e){console.error("read from Storage error ", e);}
+.navItem {
+  position: relative;
+  font-weight: 500;
 }
 
---------
-
-"use client";
-import AddUser from "./AddUser";
-import Footer from "./Footer";
-import Header from "./Header";
-import styles from "../styles/App.module.css";
-import { useUsers } from "../hooks/useUsers";
-import UserList from "./Users";
-
-function MainApp() {
-  const {users,addUser} = useUsers()
-  const Header_Message = " NextJS User CRUD App";
-  const FOOTER_Message = " User CopyRight Mesage";
-  return (
-    <div>
-      <Header hm={Header_Message} />
-      <main className={styles.container}>
-        <div className={styles.grid}>
-          <div className={styles.card}>
-            <AddUser onAdd={addUser} />
-          </div>
-          <div>
-            <UserList users={users}/>
-          </div>
-        </div>
-        <hr/>
-        <br/>
-        <Footer fm={FOOTER_Message} />
-      </main>
-    </div>
-  );
-}
-export default MainApp;
--
-----------
-
-'use client'
-
-import { useState } from 'react'
-import styles from '../styles/App.module.css'
-export default function AddUser({onAdd}){
-
-    const [username,setUsername]= useState('')
-    const [email,setEmail]= useState('')
-    const [city,setCity]= useState('')
-const handleSubmit=(e)=>{
-    e.preventDefault()
-    if(!username.trim() || !email.trim() || !city.trim()) return alert('All Fields are required')
-        onAdd({username:username.trim(),email:email.trim(),city:city.trim()})
-        reset()
-}
-const reset=()=>{
-    setUsername('')
-    setEmail('')
-    setCity('')
+.link {
+  padding: 6px 8px;
+  color: var(--nav-text);
+  transition: color 150ms ease;
 }
 
-    return (
-        <form className={styles.form} onSubmit={handleSubmit}>
-            <input placeholder='Enter Username' value={username} onChange={(e)=> setUsername(e.target.value)} className={styles.input}></input>
-              <input placeholder='Enter Email' value={email} onChange={(e)=> setEmail(e.target.value)} className={styles.input}></input>
-                <input placeholder='Enter City' value={city} onChange={(e)=> setCity(e.target.value)} className={styles.input}></input>
-                <div className={styles.controls}>
-        <button className={styles.button}>Add</button>
-             <button type='button' className={styles.button}>Reset</button>
-             </div>
-        </form>
-    )
+.link:hover {
+  color: var(--nav-hover);
 }
 
+/* Dropdown container (hidden by default) */
+.dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  background: white;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+  border-radius: 6px;
+  padding: 8px 10px;
+  min-width: 170px;
+  display: none; /* hidden - will show on hover/focus */
+  z-index: 40;
+}
+
+/* Dropdown items */
+.dropdownItem {
+  padding: 8px;
+  display: block;
+  font-size: 14px;
+  color: #0f172a;
+}
+
+/* show dropdown on parent hover (desktop) */
+.navItem:hover .dropdown,
+.navItem:focus-within .dropdown {
+  display: block;
+}
+
+/* small visual separators for items */
+.dropdownItem + .dropdownItem {
+  margin-top: 6px;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 8px;
+}

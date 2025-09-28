@@ -1,39 +1,45 @@
-import Link from "next/link";
-import styles from "./Navigation.module.css";
-
-export default function Navigation() {
+export default function Docs({ params }) {
+  const slugArray = params?.slug;
+  const isIndex = !slugArray || slugArray.length === 0;
+  const path = isIndex ? "/docs" : `/docs/${slugArray.join("/")}`;
   return (
-    <nav className={styles.navBar} aria-label="Main navigation">
-      <ul className={styles.navList}>
-        <li className={styles.navItem}>
-          <Link className={styles.Link} href="/">
-            Home
-          </Link>{" "}
-          |{" "}
-        </li>
-        <li className={styles.navItem}>
-          <Link className={styles.link} href="/about">
-            About
-          </Link>{" "}
-          |{" "}
-        </li>
-        <li className={styles.navItem}>
-          <span className={styles.link} tabIndex={0}>
-            Services{" "}
-          </span>
-          <ul
-            className={styles.dropdown}
-            role="menu"
-            aria-label="Service submenu"
-          >
+    <div>
+      {isIndex ? (
+        <>
+          <p>
+            This is Docs Page 🌬️, Path: <code>{path}</code>{" "}
+          </p>
+
+          <h3>Docs Details Here....!</h3>
+          <ul>
             <li>
-              <Link className={styles.dropdownItem} href="/services/web">
-                Web
-              </Link> 
-            </li>
+              <a href="/docs/intro">/docs/intro</a>   </li><br/>
+             <li>  <a href="/docs/getting-ready/setup">/docs/getting-ready/setup</a> </li><br/>
+             <li>  <a href="/docs/api/auth/login">/docs/api/auth/login</a> </li><br/>
+            
           </ul>
-        </li>
-      </ul>
-    </nav>
+          <p>
+            THis is using <strong>Catch All Feature</strong> Segment:
+            <code>app/docs/[[...slug]]/page.js</code>
+          </p>
+        </>
+      ) : (
+        <>
+          <p>
+            {" "}
+            Showing Doc for : <strong>{path}</strong>
+          </p>
+          <section>
+            <h2>{slugArray[slugArray.length - 1]}</h2>
+            <p> PLaceholder content</p>
+            <details>
+              <summary> Raw Params </summary>
+                <pre>{JSON.stringify({ slug: slugArray }, null, 2)}</pre>
+             
+            </details>
+          </section>
+        </>
+      )}
+    </div>
   );
 }

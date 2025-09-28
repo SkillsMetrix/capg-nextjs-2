@@ -1,45 +1,98 @@
-export default function Docs({ params }) {
-  const slugArray = params?.slug;
-  const isIndex = !slugArray || slugArray.length === 0;
-  const path = isIndex ? "/docs" : `/docs/${slugArray.join("/")}`;
-  return (
-    <div>
-      {isIndex ? (
-        <>
-          <p>
-            This is Docs Page 🌬️, Path: <code>{path}</code>{" "}
-          </p>
+// components/ProgrammaticNav.js
+"use client";
 
-          <h3>Docs Details Here....!</h3>
-          <ul>
-            <li>
-              <a href="/docs/intro">/docs/intro</a>   </li><br/>
-             <li>  <a href="/docs/getting-ready/setup">/docs/getting-ready/setup</a> </li><br/>
-             <li>  <a href="/docs/api/auth/login">/docs/api/auth/login</a> </li><br/>
-            
-          </ul>
-          <p>
-            THis is using <strong>Catch All Feature</strong> Segment:
-            <code>app/docs/[[...slug]]/page.js</code>
-          </p>
-        </>
-      ) : (
-        <>
-          <p>
-            {" "}
-            Showing Doc for : <strong>{path}</strong>
-          </p>
-          <section>
-            <h2>{slugArray[slugArray.length - 1]}</h2>
-            <p> PLaceholder content</p>
-            <details>
-              <summary> Raw Params </summary>
-                <pre>{JSON.stringify({ slug: slugArray }, null, 2)}</pre>
-             
-            </details>
-          </section>
-        </>
-      )}
+import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
+
+export default function ProgrammaticNav() {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+  const [slug, setSlug] = useState("nextjs-routing");
+  const [docsPath, setDocsPath] = useState("getting-started/setup");
+
+  async function goToBlog() {
+    // simple dynamic route push
+    router.push(`/blog/${slug}`);
+  }
+
+  function replaceWithBlog() {
+    // replace current entry (no back to previous)
+    router.replace(`/blog/${slug}`);
+  }
+
+  function goToDocsCatchAll() {
+    // catch-all example: segments joined by '/'
+    const path = `/docs/${docsPath}`;
+    router.push(path);
+  }
+
+  function goToDashboardReports() {
+    // route group -> still a normal URL
+    router.push(`/dashboard/reports`);
+  }
+
+  function goBack() {
+    router.back();
+  }
+
+  function goForward() {
+    router.forward();
+  }
+
+  function doPrefetch() {
+    // prefetch resources for a route (useful before push)
+    router.prefetch(`/blog/${slug}`);
+  }
+
+  function refreshPage() {
+    // re-fetch server data on the current page
+    router.refresh();
+  }
+
+  function pushWithTransition() {
+    // use useTransition to show pending UI for UX
+    startTransition(() => {
+      router.push(`/blog/${slug}`);
+    });
+  }
+
+  return (
+    <div style={{ border: "1px solid #e5e7eb", padding: 12, borderRadius: 8 }}>
+      <h3>Programmatic Navigation Demo</h3>
+
+      <div style={{ marginBottom: 8 }}>
+        <label>
+          Blog slug:{" "}
+          <input value={slug} onChange={(e) => setSlug(e.target.value)} />
+        </label>
+      </div>
+
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 8 }}>
+        <button onClick={goToBlog}>Push → /blog/{slug}</button>
+        <button onClick={replaceWithBlog}>Replace → /blog/{slug}</button>
+        <button onClick={pushWithTransition} disabled={isPending}>
+          {isPending ? "Navigating…" : `Transition → /blog/${slug}`}
+        </button>
+        <button onClick={doPrefetch}>Prefetch /blog/{slug}</button>
+      </div>
+
+      <div style={{ marginBottom: 8 }}>
+        <label>
+          Docs path (catch-all):{" "}
+          <input value={docsPath} onChange={(e) => setDocsPath(e.target.value)} />
+        </label>
+      </div>
+
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 8 }}>
+        <button onClick={goToDocsCatchAll}>Go to /docs/{docsPath}</button>
+        <button onClick={goToDashboardReports}>Go to /dashboard/reports</button>
+      </div>
+
+      <div style={{ display: "flex", gap: 8 }}>
+        <button onClick={goBack}>Back</button>
+        <button onClick={goForward}>Forward</button>
+        <button onClick={refreshPage}>Refresh</button>
+      </div>
     </div>
   );
 }

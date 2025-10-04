@@ -1,55 +1,36 @@
-import PassengerCard from "../components/PassengersCard";
-import { fetchPassengers } from "../lib/api";
+import dynamic from "next/dynamic";
+import { fetchFlights } from "../lib/api";
+import { Suspense } from "react";
+ 
+ 
+const FlightCard = dynamic(() => import('../components/FlightCard'),{
+  loading: () => <div className="card">Loading Card...!</div>
+})
+export default async function FlightsPage({searchParams}) {
 
-export default async function Passengers() {
-  const passengers = await fetchPassengers();
+  const resolved= await searchParams
+  let status= resolved?.status ?? null
+  console.log(status);
+  
+  if(Array.isArray(status))status = status[0]
+  if( status === '')status=null
+
+  let flights= await fetchFlights()
+  if(status) flights= flights.filter(f => String(f.status).toLowerCase() === String(status).toLowerCase())
+  
   return (
     <div>
-      <p>Passengers Details</p>
-
       <div className="grid">
-        {passengers.map((p) => (
-          <PassengerCard key={p.id} passenger={p} />
+        {flights.map(f => (
+          <Suspense key={f.id} fallback={<div className="card">Loading Flights....</div>}>
+            <FlightCard flight={f}/>
+          </Suspense>
         ))}
       </div>
+        
+       
+      
+       
     </div>
   );
-}
-
-
-
--------------
-
-
-'use client'
-
-export default function PassengerCard({passenger}) {
-    return (
-        <div className="card">
-            <div><strong>{passenger.name}</strong>
-            <div className="small">Age: {passenger.age} * Flight: {passenger.flightId}</div></div>
-        </div>
-    )
-}
-
-
-
-
-
--------
-
-const API_BASE= 'http://localhost:3001'
-
-export async function fetchFlights() {
-    const res= await fetch(`${API_BASE}/flights`,{cache:'no-store'})
-    if(!res.ok) throw new Error('Failed to fetch flights')
-        return res.json()
-    
-}
-
-export async function fetchPassengers() {
-    const res= await fetch(`${API_BASE}/passengers`,{cache:'no-store'})
-    if(!res.ok) throw new Error('Failed to fetch PAssengers')
-        return res.json()
-    
 }

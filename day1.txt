@@ -1,36 +1,25 @@
-import dynamic from "next/dynamic";
-import { fetchFlights } from "../lib/api";
-import { Suspense } from "react";
+"use client";
+import { useSearchParams,useRouter } from "next/navigation";
  
- 
-const FlightCard = dynamic(() => import('../components/FlightCard'),{
-  loading: () => <div className="card">Loading Card...!</div>
-})
-export default async function FlightsPage({searchParams}) {
 
-  const resolved= await searchParams
-  let status= resolved?.status ?? null
-  console.log(status);
-  
-  if(Array.isArray(status))status = status[0]
-  if( status === '')status=null
+export default function FlightFilterClient() {
+  const params = useSearchParams();
+  const router = useRouter();
+  const status = params.get("status") || "";
 
-  let flights= await fetchFlights()
-  if(status) flights= flights.filter(f => String(f.status).toLowerCase() === String(status).toLowerCase())
-  
+  function setStatus(s) {
+    const url = new URL(window.location.href);
+    if (s) url.searchParams.set("status", s);
+    else url.searchParams.delete("status");
+    router.push(url.pathname + url.search);
+  }
   return (
-    <div>
-      <div className="grid">
-        {flights.map(f => (
-          <Suspense key={f.id} fallback={<div className="card">Loading Flights....</div>}>
-            <FlightCard flight={f}/>
-          </Suspense>
-        ))}
-      </div>
-        
-       
-      
-       
+    <div style={{ margin: "8px 0" }}>
+      <button onClick={() => setStatus("")}>All</button>
+      <button onClick={() => setStatus("OnTime")}>ON Time</button>
+      <button onClick={() => setStatus("Delayed")}>Delayed</button>
+      <hr />
+      <div className="small">Active Filter: {status || "none"}</div>
     </div>
   );
 }

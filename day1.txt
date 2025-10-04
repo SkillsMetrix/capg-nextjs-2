@@ -1,98 +1,12 @@
-// components/ProgrammaticNav.js
-"use client";
-
-import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
-
-export default function ProgrammaticNav() {
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
-  const [slug, setSlug] = useState("nextjs-routing");
-  const [docsPath, setDocsPath] = useState("getting-started/setup");
-
-  async function goToBlog() {
-    // simple dynamic route push
-    router.push(`/blog/${slug}`);
-  }
-
-  function replaceWithBlog() {
-    // replace current entry (no back to previous)
-    router.replace(`/blog/${slug}`);
-  }
-
-  function goToDocsCatchAll() {
-    // catch-all example: segments joined by '/'
-    const path = `/docs/${docsPath}`;
-    router.push(path);
-  }
-
-  function goToDashboardReports() {
-    // route group -> still a normal URL
-    router.push(`/dashboard/reports`);
-  }
-
-  function goBack() {
-    router.back();
-  }
-
-  function goForward() {
-    router.forward();
-  }
-
-  function doPrefetch() {
-    // prefetch resources for a route (useful before push)
-    router.prefetch(`/blog/${slug}`);
-  }
-
-  function refreshPage() {
-    // re-fetch server data on the current page
-    router.refresh();
-  }
-
-  function pushWithTransition() {
-    // use useTransition to show pending UI for UX
-    startTransition(() => {
-      router.push(`/blog/${slug}`);
-    });
-  }
-
-  return (
-    <div style={{ border: "1px solid #e5e7eb", padding: 12, borderRadius: 8 }}>
-      <h3>Programmatic Navigation Demo</h3>
-
-      <div style={{ marginBottom: 8 }}>
-        <label>
-          Blog slug:{" "}
-          <input value={slug} onChange={(e) => setSlug(e.target.value)} />
-        </label>
-      </div>
-
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 8 }}>
-        <button onClick={goToBlog}>Push → /blog/{slug}</button>
-        <button onClick={replaceWithBlog}>Replace → /blog/{slug}</button>
-        <button onClick={pushWithTransition} disabled={isPending}>
-          {isPending ? "Navigating…" : `Transition → /blog/${slug}`}
-        </button>
-        <button onClick={doPrefetch}>Prefetch /blog/{slug}</button>
-      </div>
-
-      <div style={{ marginBottom: 8 }}>
-        <label>
-          Docs path (catch-all):{" "}
-          <input value={docsPath} onChange={(e) => setDocsPath(e.target.value)} />
-        </label>
-      </div>
-
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 8 }}>
-        <button onClick={goToDocsCatchAll}>Go to /docs/{docsPath}</button>
-        <button onClick={goToDashboardReports}>Go to /dashboard/reports</button>
-      </div>
-
-      <div style={{ display: "flex", gap: 8 }}>
-        <button onClick={goBack}>Back</button>
-        <button onClick={goForward}>Forward</button>
-        <button onClick={refreshPage}>Refresh</button>
-      </div>
-    </div>
-  );
+{
+  "flights": [
+    { "id": 1, "code": "AI101", "from": "DEL", "to": "BOM", "duration": "2h 10m", "seats": 180, "price": 4500, "status": "On Time" },
+    { "id": 2, "code": "6E202", "from": "BLR", "to": "DEL", "duration": "2h 30m", "seats": 150, "price": 5200, "status": "Delayed" },
+    { "id": 3, "code": "SG303", "from": "BLR", "to": "BOM", "duration": "1h 15m", "seats": 120, "price": 3200, "status": "On Time" }
+  ],
+  "passengers": [
+    { "id": 1, "name": "Asha Kumar", "age": 29, "flightId": 1 },
+    { "id": 2, "name": "Ravi Patel", "age": 34, "flightId": 2 },
+    { "id": 3, "name": "Maya Singh", "age": 25, "flightId": 1 }
+  ]
 }

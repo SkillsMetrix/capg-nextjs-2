@@ -1,25 +1,25 @@
-"use client";
-import { useSearchParams,useRouter } from "next/navigation";
- 
+const API_BASE= 'http://localhost:3001'
 
-export default function FlightFilterClient() {
-  const params = useSearchParams();
-  const router = useRouter();
-  const status = params.get("status") || "";
+export async function fetchFlights(){
+    const res= await fetch(`${API_BASE}/flights`,{cache: 'no-store'})
+    if(!res.ok) throw new Error('Failed to fetch flights')
+    return res.json()
+}
 
-  function setStatus(s) {
-    const url = new URL(window.location.href);
-    if (s) url.searchParams.set("status", s);
-    else url.searchParams.delete("status");
-    router.push(url.pathname + url.search);
-  }
-  return (
-    <div style={{ margin: "8px 0" }}>
-      <button onClick={() => setStatus("")}>All</button>
-      <button onClick={() => setStatus("OnTime")}>ON Time</button>
-      <button onClick={() => setStatus("Delayed")}>Delayed</button>
-      <hr />
-      <div className="small">Active Filter: {status || "none"}</div>
-    </div>
-  );
+export async function fetchPassengers(){
+    const res= await fetch(`${API_BASE}/passengers`,{cache: 'no-store'})
+    if(!res.ok) throw new Error('Failed to fetch passengers')
+    return res.json()
+}
+
+export async function fetchFlightByID(id){
+    const res= await fetch(`${API_BASE}/flights/${id}`,{cache: 'no-store'})
+    if(!res.ok) throw new Error('flight not found')
+    return res.json()
+}
+
+export async function fetchPassengersByFlightID(flightId){
+    const res= await fetch(`${API_BASE}/passengers?flightId=${flightId}`,{cache: 'no-store'})
+    if(!res.ok) throw new Error('Failed to fetch passengers')
+    return res.json()
 }

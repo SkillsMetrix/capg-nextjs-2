@@ -1,88 +1,55 @@
+import PassengerCard from "../components/PassengersCard";
+import { fetchPassengers } from "../lib/api";
 
-:root { --gap: 12px; }
-html, body, #root { height: 100%; }
-body { font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; margin: 0; padding: 0; }
-.container { max-width: 1000px; margin: 24px auto; padding: 16px; }
-.header { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; }
-.nav a { margin-right: 12px; text-decoration: none; }
-.card { border: 1px solid #e6e6e6; border-radius: 8px; padding: 12px; margin-bottom: 12px; }
-.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--gap); }
-.small { font-size: 0.9rem; color: #555; }
+export default async function Passengers() {
+  const passengers = await fetchPassengers();
+  return (
+    <div>
+      <p>Passengers Details</p>
 
-------
-.navBar {
-  background: var(--nav-bg);
-  border-bottom: 1px solid var(--nav-border);
-  padding: 12px 20px;
+      <div className="grid">
+        {passengers.map((p) => (
+          <PassengerCard key={p.id} passenger={p} />
+        ))}
+      </div>
+    </div>
+  );
 }
 
-.navList {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  gap: 18px;
-  align-items: center;
-  flex-wrap: wrap;
+
+
+-------------
+
+
+'use client'
+
+export default function PassengerCard({passenger}) {
+    return (
+        <div className="card">
+            <div><strong>{passenger.name}</strong>
+            <div className="small">Age: {passenger.age} * Flight: {passenger.flightId}</div></div>
+        </div>
+    )
 }
 
-.navItem {
-  position: relative;
-  font-weight: 500;
+
+
+
+
+-------
+
+const API_BASE= 'http://localhost:3001'
+
+export async function fetchFlights() {
+    const res= await fetch(`${API_BASE}/flights`,{cache:'no-store'})
+    if(!res.ok) throw new Error('Failed to fetch flights')
+        return res.json()
+    
 }
 
-.link {
-  padding: 6px 8px;
-  color: var(--nav-text);
-  transition: color 150ms ease;
-}
-
-.link:hover {
-  color: var(--nav-hover);
-}
-
-.dropdown {
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
-  background: white;
-  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
-  border-radius: 6px;
-  padding: 8px 10px;
-  min-width: 170px;
-  display: none;
-  z-index: 40;
-}
-
-.dropdownItem {
-  padding: 8px;
-  display: block;
-  font-size: 14px;
-  color: #0f172a;
-}
-
-.navItem:hover .dropdown,
-.navItem:focus-within .dropdown {
-  display: block;
-}
-
-.dropdownItem + .dropdownItem {
-  margin-top: 6px;
-  border-top: 1px solid #f1f5f9;
-  padding-top: 8px;
-}
-
----------
-
-{
-  "flights": [
-    { "id": 1, "code": "AI101", "from": "DEL", "to": "BOM", "duration": "2h 10m", "seats": 180, "price": 4500, "status": "On Time" },
-    { "id": 2, "code": "6E202", "from": "BLR", "to": "DEL", "duration": "2h 30m", "seats": 150, "price": 5200, "status": "Delayed" },
-    { "id": 3, "code": "SG303", "from": "BLR", "to": "BOM", "duration": "1h 15m", "seats": 120, "price": 3200, "status": "On Time" }
-  ],
-  "passengers": [
-    { "id": 1, "name": "Asha Kumar", "age": 29, "flightId": 1 },
-    { "id": 2, "name": "Ravi Patel", "age": 34, "flightId": 2 },
-    { "id": 3, "name": "Maya Singh", "age": 25, "flightId": 1 }
-  ]
+export async function fetchPassengers() {
+    const res= await fetch(`${API_BASE}/passengers`,{cache:'no-store'})
+    if(!res.ok) throw new Error('Failed to fetch PAssengers')
+        return res.json()
+    
 }

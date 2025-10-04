@@ -71,3 +71,18 @@ body { font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvet
   border-top: 1px solid #f1f5f9;
   padding-top: 8px;
 }
+
+---------
+
+{
+  "flights": [
+    { "id": 1, "code": "AI101", "from": "DEL", "to": "BOM", "duration": "2h 10m", "seats": 180, "price": 4500, "status": "On Time" },
+    { "id": 2, "code": "6E202", "from": "BLR", "to": "DEL", "duration": "2h 30m", "seats": 150, "price": 5200, "status": "Delayed" },
+    { "id": 3, "code": "SG303", "from": "BLR", "to": "BOM", "duration": "1h 15m", "seats": 120, "price": 3200, "status": "On Time" }
+  ],
+  "passengers": [
+    { "id": 1, "name": "Asha Kumar", "age": 29, "flightId": 1 },
+    { "id": 2, "name": "Ravi Patel", "age": 34, "flightId": 2 },
+    { "id": 3, "name": "Maya Singh", "age": 25, "flightId": 1 }
+  ]
+}

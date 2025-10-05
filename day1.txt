@@ -1,66 +1,54 @@
-import { NextResponse } from "next/server"
+"use client";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
-const JSON_BASE='http://localhost:3001'
-export async function POST(request) {
-    const body = await request.json()
-    const res= await fetch(`${JSON_BASE}/passengers`,{
+export default function AddFlight(){
+    const router= useRouter()
+    const [msg,setMsg]= useState('')
+    const [busy,setBusy]= useState(false)
+
+async function onSubmit(e) {
+    e.preventDefault();
+    setMsg('')
+    setBusy(true)
+    const fd= new FormData(e.currentTarget)
+    const body=Object.fromEntries(fd.entries())
+    body.seats= Number(body.seats || 0)
+    body.price= Number(body.price || 0)
+
+    try {
+       const res= await fetch(`/api/flights`,{
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(body)
     })
-
-    const data= await res.json()
-    if(!res.ok) return NextResponse.json({error: 'Upstream failed'},{status:502})
-        return NextResponse.json(data,{status:201})
-}
-
----------
-
-"use client";
-
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-
-export default function AddPassengerForm({ defaultFlightId = "" }) {
-  const router = useRouter();
-  const [name, setName] = useState("");
-  const [age, setAge] = useState("");
-  const [flightId, setFlightId] = useState(defaultFlightId);
-  const [saving,setSaving]= useState(false)
-
-  async function handleSubmit(e){
-    e.preventDefault()
-    setSaving(true)
-    try {
-       const res= await fetch(`/api/passengers`,{
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({name,age: Number(age),flightId: Number(flightId)})
-    })
     if(!res.ok) throw new Error('Failed to add')
-      router.push('/passengers')
+      router.push('/flights')
     }catch(err){
       alert(err.message)
     }finally{
-      setSaving(false)
+      setBusy(false)
     }
     
-    
+}
+return (
 
-  }
+    <form onSubmit={onSubmit} className="card" style={{display:'grid',gap:8}}>
+        <h3>Add Flight</h3>
+        <input name="code" placeholder="Enter Flight Code (AI101)" required/>
+         <input name="from" placeholder="From (DEL)" required/>
+          <input name="to" placeholder="To (BoB)" required/>
+           <input name="duration" placeholder="Enter Duration (2h10m)" required/>
+            <input name="price" type="number" placeholder="Enter Price" required/>
+             <input name="seats" type="number" placeholder="Enter Seats" required/>
+             <input name="status" placeholder="Flight Status" defaultValue="OnTime" required/>
+        <button disabled={busy}>{busy ? 'Saving the FLight....!' : 'Add Flight'} </button>
 
-  return (
- 
-        <form onSubmit={handleSubmit} className="card">
-            <h3>Add Passengers</h3>
-            <div style={{display:'grid', gap:8}}>
-                <input type='text' value={name} onChange={e => setName(e.target.value)} placeholder="Enter Name" required/>
-                 <input type='text' value={age} onChange={e => setAge(e.target.value)} placeholder="Enter Age" required/>
-                  <input type='text' value={flightId} onChange={e => setFlightId(e.target.value)} placeholder="Enter FlightID" required/>
-                  <button disabled={saving}>{saving ? 'Saving the Passenger....!' : 'Add Passenger'} </button>
-            </div>
-        </form>
- 
-  )
+
+    </form>
+)
+
 }
 
+
+--------------

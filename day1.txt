@@ -1,25 +1,66 @@
-const API_BASE= 'http://localhost:3001'
+import { NextResponse } from "next/server"
 
-export async function fetchFlights(){
-    const res= await fetch(`${API_BASE}/flights`,{cache: 'no-store'})
-    if(!res.ok) throw new Error('Failed to fetch flights')
-    return res.json()
+const JSON_BASE='http://localhost:3001'
+export async function POST(request) {
+    const body = await request.json()
+    const res= await fetch(`${JSON_BASE}/passengers`,{
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(body)
+    })
+
+    const data= await res.json()
+    if(!res.ok) return NextResponse.json({error: 'Upstream failed'},{status:502})
+        return NextResponse.json(data,{status:201})
 }
 
-export async function fetchPassengers(){
-    const res= await fetch(`${API_BASE}/passengers`,{cache: 'no-store'})
-    if(!res.ok) throw new Error('Failed to fetch passengers')
-    return res.json()
+---------
+
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+
+export default function AddPassengerForm({ defaultFlightId = "" }) {
+  const router = useRouter();
+  const [name, setName] = useState("");
+  const [age, setAge] = useState("");
+  const [flightId, setFlightId] = useState(defaultFlightId);
+  const [saving,setSaving]= useState(false)
+
+  async function handleSubmit(e){
+    e.preventDefault()
+    setSaving(true)
+    try {
+       const res= await fetch(`/api/passengers`,{
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({name,age: Number(age),flightId: Number(flightId)})
+    })
+    if(!res.ok) throw new Error('Failed to add')
+      router.push('/passengers')
+    }catch(err){
+      alert(err.message)
+    }finally{
+      setSaving(false)
+    }
+    
+    
+
+  }
+
+  return (
+ 
+        <form onSubmit={handleSubmit} className="card">
+            <h3>Add Passengers</h3>
+            <div style={{display:'grid', gap:8}}>
+                <input type='text' value={name} onChange={e => setName(e.target.value)} placeholder="Enter Name" required/>
+                 <input type='text' value={age} onChange={e => setAge(e.target.value)} placeholder="Enter Age" required/>
+                  <input type='text' value={flightId} onChange={e => setFlightId(e.target.value)} placeholder="Enter FlightID" required/>
+                  <button disabled={saving}>{saving ? 'Saving the Passenger....!' : 'Add Passenger'} </button>
+            </div>
+        </form>
+ 
+  )
 }
 
-export async function fetchFlightByID(id){
-    const res= await fetch(`${API_BASE}/flights/${id}`,{cache: 'no-store'})
-    if(!res.ok) throw new Error('flight not found')
-    return res.json()
-}
-
-export async function fetchPassengersByFlightID(flightId){
-    const res= await fetch(`${API_BASE}/passengers?flightId=${flightId}`,{cache: 'no-store'})
-    if(!res.ok) throw new Error('Failed to fetch passengers')
-    return res.json()
-}
